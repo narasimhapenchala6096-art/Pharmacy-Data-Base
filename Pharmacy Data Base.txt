@@ -1,0 +1,178 @@
+CREATE DATABASE pharmacy;
+USE pharmacy;
+
+-- 1. CUSTOMER TABLE
+CREATE TABLE Customers (
+    CustomerID INT PRIMARY KEY,
+    CustomerName VARCHAR(50) NOT NULL,
+    Phone VARCHAR(15),
+    Address VARCHAR(100)
+);
+
+-- 2. MEDICINE TABLE
+CREATE TABLE Medicines (
+    MedicineID INT PRIMARY KEY,
+    MedicineName VARCHAR(100) NOT NULL,
+    Category VARCHAR(50),
+    Price DECIMAL(10,2),
+    Stock INT,
+    ExpiryDate DATE
+);
+
+-- 3. SUPPLIER TABLE
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY,
+    SupplierName VARCHAR(100) NOT NULL,
+    Phone VARCHAR(15),
+    Address VARCHAR(100)
+);
+
+-- 4. PURCHASE TABLE
+CREATE TABLE Purchases (
+    PurchaseID INT PRIMARY KEY,
+    SupplierID INT,
+    MedicineID INT,
+    Quantity INT,
+    PurchaseDate DATE,
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID),
+    FOREIGN KEY (MedicineID) REFERENCES Medicines(MedicineID)
+);
+
+-- 5. SALES TABLE
+CREATE TABLE Sales (
+    SaleID INT PRIMARY KEY,
+    CustomerID INT,
+    MedicineID INT,
+    Quantity INT,
+    SaleDate DATE,
+    TotalAmount DECIMAL(10,2),
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID),
+    FOREIGN KEY (MedicineID) REFERENCES Medicines(MedicineID)
+);
+
+-- INSERT CUSTOMERS
+INSERT INTO Customers VALUES
+(101, 'Rahul', '9876543210', 'Kakinada'),
+(102, 'Priya', '9876543211', 'Rajahmundry'),
+(103, 'Arjun', '9876543212', 'Vijayawada'),
+(104, 'Sneha', '9876543213', 'Guntur');
+
+-- INSERT MEDICINES
+INSERT INTO Medicines VALUES
+(201, 'Paracetamol', 'Painkiller', 20.00, 100, '2027-06-30'),
+(202, 'Amoxicillin', 'Antibiotic', 80.00, 50, '2027-08-15'),
+(203, 'Cetirizine', 'Antiallergic', 35.00, 75, '2028-01-20'),
+(204, 'Omeprazole', 'Antacid', 45.00, 60, '2027-11-10'),
+(205, 'Azithromycin', 'Antibiotic', 120.00, 40, '2027-09-25');
+
+-- INSERT SUPPLIERS
+INSERT INTO Suppliers VALUES
+(301, 'Apollo Suppliers', '9988776655', 'Hyderabad'),
+(302, 'MedPlus Distributors', '9988776656', 'Vijayawada'),
+(303, 'HealthCare Pharma', '9988776657', 'Visakhapatnam');
+
+-- INSERT PURCHASES
+INSERT INTO Purchases VALUES
+(401, 301, 201, 50, '2026-07-01'),
+(402, 302, 202, 30, '2026-07-02'),
+(403, 303, 203, 40, '2026-07-03'),
+(404, 301, 204, 25, '2026-07-04'),
+(405, 302, 205, 20, '2026-07-05');
+
+-- INSERT SALES
+INSERT INTO Sales VALUES
+(501, 101, 201, 2, '2026-07-10', 40.00),
+(502, 102, 202, 1, '2026-07-10', 80.00),
+(503, 103, 203, 3, '2026-07-11', 105.00),
+(504, 104, 204, 2, '2026-07-11', 90.00),
+(505, 101, 205, 1, '2026-07-12', 120.00);
+
+-- DISPLAY TABLES
+SELECT * FROM Customers;
+
+SELECT * FROM Medicines;
+
+SELECT * FROM Suppliers;
+
+SELECT * FROM Purchases;
+
+SELECT * FROM Sales;
+
+-- FIND ALL ANTIBIOTIC MEDICINES
+SELECT MedicineID, MedicineName, Price
+FROM Medicines
+WHERE Category = 'Antibiotic';
+
+-- FIND MEDICINES WITH STOCK LESS THAN 60
+SELECT MedicineName, Stock
+FROM Medicines
+WHERE Stock < 60;
+
+-- FIND MEDICINES WITH PRICE GREATER THAN 50
+SELECT MedicineName, Price
+FROM Medicines
+WHERE Price > 50;
+
+-- DISPLAY CUSTOMER SALES
+SELECT C.CustomerName, M.MedicineName,
+       S.Quantity, S.TotalAmount
+FROM Customers C
+JOIN Sales S
+    ON C.CustomerID = S.CustomerID
+JOIN Medicines M
+    ON S.MedicineID = M.MedicineID;
+
+-- DISPLAY MEDICINE AND SUPPLIER DETAILS
+SELECT M.MedicineName, SP.SupplierName,
+       P.Quantity, P.PurchaseDate
+FROM Medicines M
+JOIN Purchases P
+    ON M.MedicineID = P.MedicineID
+JOIN Suppliers SP
+    ON P.SupplierID = SP.SupplierID;
+
+-- DISPLAY SALES DETAILS
+SELECT S.SaleID,
+       C.CustomerName,
+       M.MedicineName,
+       S.Quantity,
+       S.SaleDate,
+       S.TotalAmount
+FROM Sales S
+JOIN Customers C
+    ON S.CustomerID = C.CustomerID
+JOIN Medicines M
+    ON S.MedicineID = M.MedicineID;
+
+-- TOTAL SALES AMOUNT
+SELECT SUM(TotalAmount) AS TotalSales
+FROM Sales;
+
+-- AVERAGE MEDICINE PRICE
+SELECT AVG(Price) AS AveragePrice
+FROM Medicines;
+
+-- HIGHEST MEDICINE PRICE
+SELECT MAX(Price) AS HighestPrice
+FROM Medicines;
+
+-- LOWEST MEDICINE PRICE
+SELECT MIN(Price) AS LowestPrice
+FROM Medicines;
+
+-- COUNT NUMBER OF MEDICINES
+SELECT COUNT(*) AS TotalMedicines
+FROM Medicines;
+
+-- SORT MEDICINES BY PRICE
+SELECT *
+FROM Medicines
+ORDER BY Price DESC;
+
+-- SORT MEDICINES BY STOCK
+SELECT *
+FROM Medicines
+ORDER BY Stock ASC;
+
+-- SHOW TABLES
+SHOW TABLES;
